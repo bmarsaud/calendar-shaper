@@ -1,12 +1,14 @@
 package fr.bmarsaud.calendarshaper.http;
 
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.Request;
-import org.glassfish.grizzly.http.server.Response;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 import fr.bmarsaud.calendarshaper.model.Calendar;
 
-public class RequestHandler extends HttpHandler {
+public class RequestHandler implements HttpHandler {
     private Calendar calendar;
 
     public RequestHandler(Calendar calendar) {
@@ -14,11 +16,15 @@ public class RequestHandler extends HttpHandler {
     }
 
     @Override
-    public void service(Request request, Response response) throws Exception {
+    public void handle(HttpExchange exchange) throws IOException {
         //TODO: forwards request
         final String message = "Calendar \"" + calendar.getName() + "\"";
-        response.setContentType("text/plain");
-        response.setContentLength(message.length());
-        response.getWriter().write(message);
+
+        exchange.getResponseHeaders().add("Content-Type", "text/plain");
+        exchange.sendResponseHeaders(200, message.getBytes().length);
+
+        OutputStream os = exchange.getResponseBody();
+        os.write(message.getBytes());
+        os.close();
     }
 }

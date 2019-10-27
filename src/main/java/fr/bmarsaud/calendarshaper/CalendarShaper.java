@@ -2,14 +2,15 @@ package fr.bmarsaud.calendarshaper;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.glassfish.grizzly.http.server.HttpServer;
+import com.sun.net.httpserver.HttpContext;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -56,21 +57,22 @@ public class CalendarShaper {
     }
 
     public void start(int port) {
-        HttpServer server = HttpServer.createSimpleServer("", port);
-
-        for(Calendar calendar : calendars) {
-            server.getServerConfiguration().addHttpHandler(new RequestHandler(calendar), "/" + calendar.getName());
-        }
-
         try {
+            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            for(Calendar calendar : calendars) {
+                HttpContext context = server.createContext("/" + calendar.getName());
+                context.setHandler(new RequestHandler(calendar));
+            }
+
             server.start();
+
             System.out.println("calendar-shaper successfully started ! Press key to stop...");
             System.in.read();
+
+            server.stop(port);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        saveCalendars();
     }
 
     public static void main(String[] args) {
@@ -82,5 +84,6 @@ public class CalendarShaper {
         CalendarShaper calendarShaper = new CalendarShaper();
         calendarShaper.loadCalendars();
         calendarShaper.start(port);
+        calendarShaper.saveCalendars();
     }
 }
