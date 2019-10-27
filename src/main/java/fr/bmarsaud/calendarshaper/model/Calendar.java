@@ -1,16 +1,16 @@
 package fr.bmarsaud.calendarshaper.model;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 
 import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
 
 public class Calendar {
     private String name;
-    private URL url;
+    private URI url;
     private ArrayList<CalendarRule> rules;
 
-    public Calendar(String name, URL url) {
+    public Calendar(String name, URI url) {
         this.name = name;
         this.url = url;
         this.rules = new ArrayList<>();
@@ -29,11 +29,11 @@ public class Calendar {
         this.name = name;
     }
 
-    public URL getUrl() {
+    public URI getUrl() {
         return url;
     }
 
-    public void setUrl(URL url) {
+    public void setUrl(URI url) {
         this.url = url;
     }
 
