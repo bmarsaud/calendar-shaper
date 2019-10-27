@@ -42,14 +42,19 @@ public class RequestHandler implements HttpHandler {
             byte[] data = (byte[]) response.body();
 
             for(String header : response.headers().map().keySet()) {
-                exchange.getResponseHeaders().add(header, response.headers().firstValue(header).get());
+                //TODO: is other transfer encoding method needed for calendar specific applications ?
+                if(!header.toLowerCase().equals("transfer-encoding")) {
+                    exchange.getResponseHeaders().set(header, response.headers().firstValue(header).get());
+                }
             }
 
-            exchange.sendResponseHeaders(response.statusCode(), data.length);
+            exchange.sendResponseHeaders(response.statusCode(), data.length > 0 ? data.length : -1);
 
             OutputStream os = exchange.getResponseBody();
             os.write(data);
             os.close();
+
+            exchange.close();
 
             logger.info("Response sent with status " + response.statusCode() + " ("  + data.length + " bytes sent)");
         } else {
