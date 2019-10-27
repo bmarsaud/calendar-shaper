@@ -6,8 +6,8 @@ An iCalendar &#128467; proxy that allows you to shape the data to your needs for
 *Work in progress*
 
 ## Dependencies
-* [grizzly-http-server](https://javaee.github.io/grizzly/httpserverframework.html) - Built in http server framework
 * [gson](https://github.com/google/gson) - JSON serialization/deserialization library
+* [log4j](https://logging.apache.org/log4j/2.x/) - Logging library
 
 ## Contributors
 Brought to you with ❤️ by :
