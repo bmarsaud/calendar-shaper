@@ -21,9 +21,16 @@ public class RequestHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest forwardedRequest = buildRequest(exchange);
+
+        HttpResponse response = null;
         try {
-            HttpRequest forwardedRequest = buildRequest(exchange);
-            HttpResponse response = httpClient.send(forwardedRequest, HttpResponse.BodyHandlers.ofByteArray());
+            response = httpClient.send(forwardedRequest, HttpResponse.BodyHandlers.ofByteArray());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if(response != null) {
             byte[] data = (byte[]) response.body();
 
             for(String header : response.headers().map().keySet()) {
@@ -35,8 +42,8 @@ public class RequestHandler implements HttpHandler {
             OutputStream os = exchange.getResponseBody();
             os.write(data);
             os.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            exchange.sendResponseHeaders(500, -1);
         }
     }
 
@@ -59,9 +66,9 @@ public class RequestHandler implements HttpHandler {
         for(String header : exchange.getRequestHeaders().keySet()) {
             try {
                 requestBuilder.setHeader(header, exchange.getRequestHeaders().getFirst(header));
-            } catch(IllegalArgumentException ex) {
+            } catch(IllegalArgumentException e) {
                 //TODO: log this
-                ex.printStackTrace();
+                e.printStackTrace();
             }
         }
 
