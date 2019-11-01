@@ -11,8 +11,12 @@ import java.io.OutputStream;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import fr.bmarsaud.calendarshaper.model.Calendar;
+import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
 
 public class RequestHandler implements HttpHandler {
     private Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -40,6 +44,18 @@ public class RequestHandler implements HttpHandler {
 
         if(response != null) {
             byte[] data = (byte[]) response.body();
+            Optional<String> contentTypeHeader = response.headers().firstValue("Content-Type");
+
+            if(contentTypeHeader.isPresent() && contentTypeHeader.get().contains("text")) {
+                Charset charset = StandardCharsets.UTF_8;
+
+                String contentType = contentTypeHeader.get();
+                if(contentType.contains("charset")) {
+                    charset = Charset.forName(contentType.split("charset=")[1].split(";")[0]);
+                }
+
+                data = processResponse(data, charset);
+            }
 
             for(String header : response.headers().map().keySet()) {
                 //TODO: is other transfer encoding method needed for calendar specific applications ?
@@ -87,5 +103,16 @@ public class RequestHandler implements HttpHandler {
         }
 
         return requestBuilder.build();
+    }
+
+    public byte[] processResponse(byte[] data, Charset charset) {
+        String stringData = new String(data, charset);
+
+        for(CalendarRule rule : calendar.getRules()) {
+            logger.debug("Applying rule " + rule.getClass().getSimpleName());
+            stringData = rule.apply(stringData);
+        }
+
+        return stringData.getBytes(charset);
     }
 }

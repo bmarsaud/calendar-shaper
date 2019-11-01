@@ -1,5 +1,5 @@
 package fr.bmarsaud.calendarshaper.model.rules;
 
 public abstract class CalendarRule {
-    public abstract void apply(String data);
+    public abstract String apply(String data);
 }
