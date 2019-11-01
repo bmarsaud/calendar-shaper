@@ -9,7 +9,7 @@ public class RemoveRule extends CalendarRule {
 
     @Override
     public String apply(String data) {
-        return data;
+        return data.replaceAll(pattern, "");
     }
 
     public String getPattern() {
