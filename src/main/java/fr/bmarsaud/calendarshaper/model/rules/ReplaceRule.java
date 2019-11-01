@@ -11,7 +11,7 @@ public class ReplaceRule extends CalendarRule {
 
     @Override
     public String apply(String data) {
-        return data;
+        return data.replaceAll(pattern, replacement);
     }
 
     public String getPattern() {
