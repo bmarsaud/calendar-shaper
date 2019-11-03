@@ -29,6 +29,7 @@ public class CalendarShaper {
     private ArrayList<Calendar> calendars;
     private Configuration config;
     private Gson gson;
+    private HttpServer server;
 
     public CalendarShaper() {
         calendars = new ArrayList<>();
@@ -89,7 +90,7 @@ public class CalendarShaper {
 
     public void start() {
         try {
-            HttpServer server = HttpServer.create(new InetSocketAddress(config.getPort()), 0);
+            server = HttpServer.create(new InetSocketAddress(config.getPort()), 0);
             for(Calendar calendar : calendars) {
                 HttpContext context = server.createContext("/" + calendar.getName());
                 context.setHandler(new RequestHandler(calendar));
@@ -98,20 +99,23 @@ public class CalendarShaper {
             server.start();
 
             logger.info("calendar-shaper successfully started on port " + config.getPort() + " ! Press key to stop...");
-            System.in.read();
-
-            logger.info("Stopping server...");
-            server.stop(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void stop() {
+        logger.info("Stopping server...");
+        saveCalendars();
+        server.stop(1);
+    }
+
     public static void main(String[] args) {
         CalendarShaper calendarShaper = new CalendarShaper();
+        Runtime.getRuntime().addShutdownHook(new Thread(calendarShaper::stop));
+
         calendarShaper.loadConfiguration();
         calendarShaper.loadCalendars();
         calendarShaper.start();
-        calendarShaper.saveCalendars();
     }
 }
