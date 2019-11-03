@@ -34,19 +34,19 @@ public class FindAndReplaceRule extends CalendarRule {
             }
         } else if(ruleScope == RuleScope.EVENT) {
             final String splitToken = "BEGIN:VEVENT\r\n";
-            String[] splittedData = data.split(splitToken);
+            String[] splitData = data.split(splitToken);
             String parsedData = "";
 
-            for(int i = 0; i < splittedData.length; i++) {
-                findMatcher = compiledPatternToFind.matcher(splittedData[i]);
-                replaceMatcher = compiledPatternToReplace.matcher(splittedData[i]);
+            for(int i = 0; i < splitData.length; i++) {
+                findMatcher = compiledPatternToFind.matcher(splitData[i]);
+                replaceMatcher = compiledPatternToReplace.matcher(splitData[i]);
 
                 if(findMatcher.find()) stringToFind = findMatcher.group(findGroupId);
                 if(replaceMatcher.find()) stringToReplace = replaceMatcher.group(replaceGroupId);
 
                 if(stringToFind != null && stringToReplace != null) {
                     parsedData += splitToken;
-                    parsedData += splittedData[i].replaceAll(stringToFind, stringToReplace);
+                    parsedData += splitData[i].replaceAll(stringToFind, stringToReplace);
                     logger.debug("String \"" + stringToFind + "\" replaced by \"" + stringToReplace + "\"");
                 }
             }
