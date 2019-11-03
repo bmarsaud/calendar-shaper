@@ -109,8 +109,13 @@ public class RequestHandler implements HttpHandler {
         String stringData = new String(data, charset);
 
         for(CalendarRule rule : calendar.getRules()) {
-            logger.debug("Applying rule " + rule.getClass().getSimpleName());
-            stringData = rule.apply(stringData);
+            try {
+                logger.debug("Applying rule " + rule.getClass().getSimpleName());
+                stringData = rule.apply(stringData);
+            } catch(Exception ex) {
+                logger.error("Exception while applying rule " + rule.getClass().getSimpleName() + ":");
+                ex.printStackTrace();
+            }
         }
 
         return stringData.getBytes(charset);
