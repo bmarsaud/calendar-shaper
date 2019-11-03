@@ -74,11 +74,13 @@ public class CalendarShaper {
     public void saveCalendars() {
         File file = new File(Configuration.CALENDAR_FILE);
         try {
-            FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(gson.toJson(calendars));
-            fileWriter.flush();
-            fileWriter.close();
-            logger.info("Calendars saved");
+            if(file.exists()) {
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.write(gson.toJson(calendars));
+                fileWriter.flush();
+                fileWriter.close();
+                logger.info("Calendars saved");
+            }
         } catch (IOException e) {
             logger.error("Error while saving the calendars");
             e.printStackTrace();
