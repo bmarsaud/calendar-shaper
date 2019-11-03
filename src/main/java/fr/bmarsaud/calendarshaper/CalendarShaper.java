@@ -99,7 +99,7 @@ public class CalendarShaper {
             System.in.read();
 
             logger.info("Stopping server...");
-            server.stop(config.getPort());
+            server.stop(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
