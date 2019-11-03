@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -21,6 +24,8 @@ import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
 import fr.bmarsaud.calendarshaper.model.rules.RuleSerializer;
 
 public class CalendarShaper {
+    private Logger logger = LoggerFactory.getLogger(CalendarShaper.class);
+
     private ArrayList<Calendar> calendars;
     private Configuration config;
     private Gson gson;
@@ -40,10 +45,13 @@ public class CalendarShaper {
             try {
                 FileReader fileReader = new FileReader(file);
                 config = gson.fromJson(fileReader, Configuration.class);
+                logger.info("Configuration loaded !");
             } catch (FileNotFoundException e) {
+                logger.error("Error while loading the configuration");
                 e.printStackTrace();
             }
         } else {
+            logger.info("No config found, fallback to default configuration");
             config = new Configuration();
         }
     }
@@ -55,7 +63,9 @@ public class CalendarShaper {
             try {
                 FileReader fileReader = new FileReader(file);
                 calendars = new ArrayList(Arrays.asList(gson.fromJson(fileReader, Calendar[].class)));
+                logger.info(calendars.size() + " calendar" + (calendars.size() > 1 ? "s" : "") +" loaded !");
             } catch (FileNotFoundException e) {
+                logger.error("Error while loading the calendars");
                 e.printStackTrace();
             }
         }
@@ -68,7 +78,9 @@ public class CalendarShaper {
             fileWriter.write(gson.toJson(calendars));
             fileWriter.flush();
             fileWriter.close();
+            logger.info("Calendars saved");
         } catch (IOException e) {
+            logger.error("Error while saving the calendars");
             e.printStackTrace();
         }
     }
@@ -83,9 +95,10 @@ public class CalendarShaper {
 
             server.start();
 
-            System.out.println("calendar-shaper successfully started on port " + config.getPort() + " ! Press key to stop...");
+            logger.info("calendar-shaper successfully started on port " + config.getPort() + " ! Press key to stop...");
             System.in.read();
 
+            logger.info("Stopping server...");
             server.stop(config.getPort());
         } catch (IOException e) {
             e.printStackTrace();
