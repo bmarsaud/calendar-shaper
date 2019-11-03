@@ -21,7 +21,7 @@ public class RuleSerializer implements JsonSerializer<CalendarRule>, JsonDeseria
     @Override
     public JsonElement serialize(CalendarRule calendarRule, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject obj = new JsonObject();
-        obj.addProperty("type", calendarRule.getClass().getSimpleName().replaceAll("Rule", "").toLowerCase());
+        obj.addProperty("type", calendarRule.getClass().getSimpleName().replaceAll("Rule", ""));
 
         JsonObject params = gson.toJsonTree(calendarRule).getAsJsonObject();
         obj.add("params", params);
