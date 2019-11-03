@@ -8,8 +8,8 @@ public class RemoveRule extends CalendarRule {
     }
 
     @Override
-    public void apply(String data) {
-
+    public String apply(String data) {
+        return data.replaceAll(pattern, "");
     }
 
     public String getPattern() {
