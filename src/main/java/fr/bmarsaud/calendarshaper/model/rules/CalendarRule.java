@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 
 public abstract class CalendarRule {
-    protected Logger logger = LoggerFactory.getLogger(CalendarRule.class);
+    protected transient Logger logger = LoggerFactory.getLogger(CalendarRule.class);
 
     public abstract String apply(String data);
 }

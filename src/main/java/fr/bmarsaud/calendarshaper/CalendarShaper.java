@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,12 +19,17 @@ import java.util.Arrays;
 
 import fr.bmarsaud.calendarshaper.http.RequestHandler;
 import fr.bmarsaud.calendarshaper.model.Calendar;
+import fr.bmarsaud.calendarshaper.model.Configuration;
 import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
 import fr.bmarsaud.calendarshaper.model.rules.RuleSerializer;
 
 public class CalendarShaper {
+    private Logger logger = LoggerFactory.getLogger(CalendarShaper.class);
+
     private ArrayList<Calendar> calendars;
+    private Configuration config;
     private Gson gson;
+    private HttpServer server;
 
     public CalendarShaper() {
         calendars = new ArrayList<>();
@@ -31,34 +39,58 @@ public class CalendarShaper {
         gson = gsonBuilder.setPrettyPrinting().create();
     }
 
+    public void loadConfiguration() {
+        File file = new File(Configuration.CONFIG_FILE);
+
+        if(file.exists()) {
+            try {
+                FileReader fileReader = new FileReader(file);
+                config = gson.fromJson(fileReader, Configuration.class);
+                logger.info("Configuration loaded !");
+            } catch (FileNotFoundException e) {
+                logger.error("Error while loading the configuration");
+                e.printStackTrace();
+            }
+        } else {
+            logger.info("No config found, fallback to default configuration");
+            config = new Configuration();
+        }
+    }
+
     public void loadCalendars() {
-        File file = new File("calendars.json");
+        File file = new File(Configuration.CALENDAR_FILE);
 
         if(file.exists()) {
             try {
                 FileReader fileReader = new FileReader(file);
                 calendars = new ArrayList(Arrays.asList(gson.fromJson(fileReader, Calendar[].class)));
+                logger.info(calendars.size() + " calendar" + (calendars.size() > 1 ? "s" : "") +" loaded !");
             } catch (FileNotFoundException e) {
+                logger.error("Error while loading the calendars");
                 e.printStackTrace();
             }
         }
     }
 
     public void saveCalendars() {
-        File file = new File("calendars.json");
+        File file = new File(Configuration.CALENDAR_FILE);
         try {
-            FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(gson.toJson(calendars));
-            fileWriter.flush();
-            fileWriter.close();
+            if(file.exists()) {
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.write(gson.toJson(calendars));
+                fileWriter.flush();
+                fileWriter.close();
+                logger.info("Calendars saved");
+            }
         } catch (IOException e) {
+            logger.error("Error while saving the calendars");
             e.printStackTrace();
         }
     }
 
-    public void start(int port) {
+    public void start() {
         try {
-            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            server = HttpServer.create(new InetSocketAddress(config.getPort()), 0);
             for(Calendar calendar : calendars) {
                 HttpContext context = server.createContext("/" + calendar.getName());
                 context.setHandler(new RequestHandler(calendar));
@@ -66,24 +98,24 @@ public class CalendarShaper {
 
             server.start();
 
-            System.out.println("calendar-shaper successfully started ! Press key to stop...");
-            System.in.read();
-
-            server.stop(port);
+            logger.info("calendar-shaper successfully started on port " + config.getPort() + " ! Press key to stop...");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        int port = 8080;
-        if(args.length == 1) {
-            port = Integer.valueOf(args[0]);
-        }
+    public void stop() {
+        logger.info("Stopping server...");
+        saveCalendars();
+        server.stop(1);
+    }
 
+    public static void main(String[] args) {
         CalendarShaper calendarShaper = new CalendarShaper();
+        Runtime.getRuntime().addShutdownHook(new Thread(calendarShaper::stop));
+
+        calendarShaper.loadConfiguration();
         calendarShaper.loadCalendars();
-        calendarShaper.start(port);
-        calendarShaper.saveCalendars();
+        calendarShaper.start();
     }
 }

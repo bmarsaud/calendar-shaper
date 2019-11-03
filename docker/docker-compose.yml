@@ -1,0 +1,15 @@
+version: '3'
+services:
+  server:
+    image: "registry.mouseover.fr:5000/bmarsaud/calendar-shaper:latest"
+    environment:
+      LETSENCRYPT_HOST: calendar-shaper.mouseover.fr
+      LETSENCRYPT_EMAIL: pro@bastien-marsaud.fr
+      VIRTUAL_HOST: calendar-shaper.mouseover.fr
+    ports:
+      - 80
+    volumes:
+      - calendar-shaper:/opt/calendar-shaper/config
+
+volumes:
+  calendar-shaper:
