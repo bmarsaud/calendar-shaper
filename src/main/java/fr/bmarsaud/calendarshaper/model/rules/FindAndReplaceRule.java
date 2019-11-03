@@ -8,25 +8,56 @@ public class FindAndReplaceRule extends CalendarRule {
     private String patternToReplace;
     private int findGroupId;
     private int replaceGroupId;
+    private RuleScope ruleScope;
 
     @Override
     public String apply(String data) {
-        String stringToFind = null;
-        String stringToReplace = null;
-
         Pattern compiledPatternToFind = Pattern.compile(patternToFind);
         Pattern compiledPatternToReplace = Pattern.compile(patternToReplace);
 
-        Matcher findMatcher = compiledPatternToFind.matcher(data);
-        Matcher replaceMatcher = compiledPatternToReplace.matcher(data);
+        Matcher findMatcher;
+        Matcher replaceMatcher;
 
-        if(findMatcher.find()) stringToFind = findMatcher.group(findGroupId);
-        if(replaceMatcher.find()) stringToReplace = replaceMatcher.group(replaceGroupId);
+        String stringToFind = null;
+        String stringToReplace = null;
 
-        if(stringToFind != null && stringToReplace != null) {
-            data = data.replaceAll(stringToFind, stringToReplace);
-            logger.debug("String \"" + stringToFind + "\" replaced by \"" + stringToReplace + "\"");
+        if(ruleScope == RuleScope.CALENDAR) {
+            findMatcher = compiledPatternToFind.matcher(data);
+            replaceMatcher = compiledPatternToReplace.matcher(data);
+
+            if(findMatcher.find()) stringToFind = findMatcher.group(findGroupId);
+            if(replaceMatcher.find()) stringToReplace = replaceMatcher.group(replaceGroupId);
+
+            if(stringToFind != null && stringToReplace != null) {
+                data = data.replaceAll(stringToFind, stringToReplace);
+                logger.debug("String \"" + stringToFind + "\" replaced by \"" + stringToReplace + "\"");
+            }
+        } else if(ruleScope == RuleScope.EVENT) {
+            final String splitToken = "BEGIN:VEVENT\r\n";
+            String[] splittedData = data.split(splitToken);
+            String parsedData = "";
+
+            for(int i = 0; i < splittedData.length; i++) {
+                findMatcher = compiledPatternToFind.matcher(splittedData[i]);
+                replaceMatcher = compiledPatternToReplace.matcher(splittedData[i]);
+
+                if(findMatcher.find()) stringToFind = findMatcher.group(findGroupId);
+                if(replaceMatcher.find()) stringToReplace = replaceMatcher.group(replaceGroupId);
+
+                if(stringToFind != null && stringToReplace != null) {
+                    parsedData += splitToken;
+                    parsedData += splittedData[i].replaceAll(stringToFind, stringToReplace);
+                    logger.debug("String \"" + stringToFind + "\" replaced by \"" + stringToReplace + "\"");
+                }
+            }
+
+            if(parsedData.length() > 0) {
+                data = parsedData.substring(splitToken.length());
+            }
+        } else {
+            logger.error("RuleScope " + ruleScope + " is not supported !");
         }
+
 
         return data;
     }
