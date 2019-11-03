@@ -16,11 +16,13 @@ import java.util.Arrays;
 
 import fr.bmarsaud.calendarshaper.http.RequestHandler;
 import fr.bmarsaud.calendarshaper.model.Calendar;
+import fr.bmarsaud.calendarshaper.model.Configuration;
 import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
 import fr.bmarsaud.calendarshaper.model.rules.RuleSerializer;
 
 public class CalendarShaper {
     private ArrayList<Calendar> calendars;
+    private Configuration config;
     private Gson gson;
 
     public CalendarShaper() {
@@ -31,8 +33,23 @@ public class CalendarShaper {
         gson = gsonBuilder.setPrettyPrinting().create();
     }
 
+    public void loadConfiguration() {
+        File file = new File(Configuration.CONFIG_FILE);
+
+        if(file.exists()) {
+            try {
+                FileReader fileReader = new FileReader(file);
+                config = gson.fromJson(fileReader, Configuration.class);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            config = new Configuration();
+        }
+    }
+
     public void loadCalendars() {
-        File file = new File("calendars.json");
+        File file = new File(Configuration.CALENDAR_FILE);
 
         if(file.exists()) {
             try {
@@ -45,7 +62,7 @@ public class CalendarShaper {
     }
 
     public void saveCalendars() {
-        File file = new File("calendars.json");
+        File file = new File(Configuration.CALENDAR_FILE);
         try {
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(gson.toJson(calendars));
@@ -56,9 +73,9 @@ public class CalendarShaper {
         }
     }
 
-    public void start(int port) {
+    public void start() {
         try {
-            HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+            HttpServer server = HttpServer.create(new InetSocketAddress(config.getPort()), 0);
             for(Calendar calendar : calendars) {
                 HttpContext context = server.createContext("/" + calendar.getName());
                 context.setHandler(new RequestHandler(calendar));
@@ -66,24 +83,20 @@ public class CalendarShaper {
 
             server.start();
 
-            System.out.println("calendar-shaper successfully started ! Press key to stop...");
+            System.out.println("calendar-shaper successfully started on port " + config.getPort() + " ! Press key to stop...");
             System.in.read();
 
-            server.stop(port);
+            server.stop(config.getPort());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        int port = 8080;
-        if(args.length == 1) {
-            port = Integer.valueOf(args[0]);
-        }
-
         CalendarShaper calendarShaper = new CalendarShaper();
+        calendarShaper.loadConfiguration();
         calendarShaper.loadCalendars();
-        calendarShaper.start(port);
+        calendarShaper.start();
         calendarShaper.saveCalendars();
     }
 }
