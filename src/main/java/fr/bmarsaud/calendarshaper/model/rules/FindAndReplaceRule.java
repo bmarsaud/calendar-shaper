@@ -29,7 +29,7 @@ public class FindAndReplaceRule extends CalendarRule {
             if(replaceMatcher.find()) stringToReplace = replaceMatcher.group(replaceGroupId);
 
             if(stringToFind != null && stringToReplace != null) {
-                data = data.replaceAll(stringToFind, stringToReplace);
+                data = data.replaceAll(Pattern.quote(stringToFind), Pattern.quote(stringToReplace));
                 logger.debug("String \"" + stringToFind + "\" replaced by \"" + stringToReplace + "\"");
             }
         } else if(ruleScope == RuleScope.EVENT) {
@@ -46,8 +46,11 @@ public class FindAndReplaceRule extends CalendarRule {
 
                 if(stringToFind != null && stringToReplace != null) {
                     parsedData += splitToken;
-                    parsedData += splitData[i].replaceAll(stringToFind, stringToReplace);
+                    parsedData += splitData[i].replaceAll(Pattern.quote(stringToFind), Pattern.quote(stringToReplace));
                     logger.debug("String \"" + stringToFind + "\" replaced by \"" + stringToReplace + "\"");
+                } else {
+                    parsedData += splitToken;
+                    parsedData += splitData[i];
                 }
             }
 
