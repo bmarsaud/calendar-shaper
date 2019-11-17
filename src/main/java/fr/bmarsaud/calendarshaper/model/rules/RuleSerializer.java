@@ -1,6 +1,7 @@
 package fr.bmarsaud.calendarshaper.model.rules;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -9,30 +10,33 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import org.apache.log4j.helpers.Transform;
+
 import java.lang.reflect.Type;
 
-public class RuleSerializer implements JsonSerializer<CalendarRule>, JsonDeserializer<CalendarRule> {
+import fr.bmarsaud.calendarshaper.model.transformations.Transformation;
+import fr.bmarsaud.calendarshaper.model.transformations.TransformationSerializer;
+
+public class RuleSerializer implements JsonSerializer<ShaperRule>, JsonDeserializer<ShaperRule> {
     private Gson gson;
 
     public RuleSerializer() {
-        gson = new Gson();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Transformation.class, new TransformationSerializer());
+        gson = gsonBuilder.create();
     }
 
     @Override
-    public JsonElement serialize(CalendarRule calendarRule, Type type, JsonSerializationContext jsonSerializationContext) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("type", calendarRule.getClass().getSimpleName().replaceAll("Rule", ""));
-
-        JsonObject params = gson.toJsonTree(calendarRule).getAsJsonObject();
-        obj.add("params", params);
+    public JsonElement serialize(ShaperRule shaperRule, Type type, JsonSerializationContext jsonSerializationContext) {
+        JsonObject obj = gson.toJsonTree(shaperRule).getAsJsonObject();
+        obj.addProperty("type", shaperRule.getClass().getSimpleName());
 
         return obj;
     }
 
     @Override
-    public CalendarRule deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public ShaperRule deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         String className = jsonElement.getAsJsonObject().get("type").getAsString();
-        className = className.substring(0,1).toUpperCase() + className.substring(1) + "Rule";
 
         Class objClass = type.getClass();
         try {
@@ -41,7 +45,9 @@ public class RuleSerializer implements JsonSerializer<CalendarRule>, JsonDeseria
             e.printStackTrace();
         }
 
-        JsonObject jsonObject = jsonElement.getAsJsonObject().get("params").getAsJsonObject();
-        return (CalendarRule) gson.fromJson(jsonObject, objClass);
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        jsonObject.remove("type");
+
+        return (ShaperRule) gson.fromJson(jsonObject, objClass);
     }
 }

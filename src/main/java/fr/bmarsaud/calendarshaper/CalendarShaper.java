@@ -20,8 +20,10 @@ import java.util.Arrays;
 import fr.bmarsaud.calendarshaper.http.RequestHandler;
 import fr.bmarsaud.calendarshaper.model.Calendar;
 import fr.bmarsaud.calendarshaper.model.Configuration;
-import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
+import fr.bmarsaud.calendarshaper.model.rules.ShaperRule;
 import fr.bmarsaud.calendarshaper.model.rules.RuleSerializer;
+import fr.bmarsaud.calendarshaper.model.transformations.Transformation;
+import fr.bmarsaud.calendarshaper.model.transformations.TransformationSerializer;
 
 public class CalendarShaper {
     private Logger logger = LoggerFactory.getLogger(CalendarShaper.class);
@@ -35,7 +37,7 @@ public class CalendarShaper {
         calendars = new ArrayList<>();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(CalendarRule.class, new RuleSerializer());
+        gsonBuilder.registerTypeAdapter(ShaperRule.class, new RuleSerializer());
         gson = gsonBuilder.setPrettyPrinting().create();
     }
 
