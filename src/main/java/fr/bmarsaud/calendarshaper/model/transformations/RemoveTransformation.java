@@ -9,6 +9,6 @@ public class RemoveTransformation extends Transformation {
 
     @Override
     public String transform(String data) {
-        return data.replace(data, "");
+        return data.replaceAll(regex, "");
     }
 }
