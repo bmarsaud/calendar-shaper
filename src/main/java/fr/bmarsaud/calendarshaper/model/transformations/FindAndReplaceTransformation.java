@@ -3,7 +3,7 @@ package fr.bmarsaud.calendarshaper.model.transformations;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FindAnReplaceTransformation extends Transformation {
+public class FindAndReplaceTransformation extends Transformation {
     private String findRegex;
     private int findGroupId;
     private String replaceRegex;
@@ -12,7 +12,7 @@ public class FindAnReplaceTransformation extends Transformation {
     private transient Pattern findPattern;
     private transient Pattern replacePattern;
 
-    public FindAnReplaceTransformation(String findRegex, int findGroupId, String replaceRegex, int replaceGroupId) {
+    public FindAndReplaceTransformation(String findRegex, int findGroupId, String replaceRegex, int replaceGroupId) {
         this.findRegex = findRegex;
         this.findGroupId = findGroupId;
         this.replaceRegex = replaceRegex;
@@ -35,7 +35,7 @@ public class FindAnReplaceTransformation extends Transformation {
         if(replaceMatcher.find()) stringToReplace = replaceMatcher.group(replaceGroupId);
 
         if(stringToFind != null && stringToReplace != null) {
-            data = data.replaceAll(Pattern.quote(stringToFind), Pattern.quote(stringToReplace));
+            data = data.replaceAll(Pattern.quote(stringToFind), stringToReplace);
         }
 
         return data;
