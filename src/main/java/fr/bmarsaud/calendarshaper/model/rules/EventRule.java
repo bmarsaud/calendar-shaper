@@ -3,11 +3,11 @@ package fr.bmarsaud.calendarshaper.model.rules;
 import fr.bmarsaud.calendarshaper.model.transformations.Transformation;
 
 public class EventRule extends ShaperRule {
-    final static String splitToken = "BEGIN:VEVENT\r\n";
+    public final static String SPLIT_TOKEN = "BEGIN:VEVENT\r\n";
 
     @Override
     public String apply(String data) {
-        String splitData[] = data.split(splitToken);
+        String splitData[] = data.split(SPLIT_TOKEN);
         String parsedData = splitData[0];
 
         for(int i = 1; i < splitData.length - 1; i++ ) {
@@ -17,6 +17,7 @@ public class EventRule extends ShaperRule {
                  eventData = transformation.transform(eventData);
             }
 
+            parsedData += SPLIT_TOKEN;
             parsedData += eventData;
         }
 
