@@ -3,12 +3,12 @@ package fr.bmarsaud.calendarshaper.model;
 import java.net.URI;
 import java.util.ArrayList;
 
-import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
+import fr.bmarsaud.calendarshaper.model.rules.ShaperRule;
 
 public class Calendar {
     private String name;
     private URI url;
-    private ArrayList<CalendarRule> rules;
+    private ArrayList<ShaperRule> rules;
 
     public Calendar(String name, URI url) {
         this.name = name;
@@ -16,7 +16,7 @@ public class Calendar {
         this.rules = new ArrayList<>();
     }
 
-    public Calendar(String name, ArrayList<CalendarRule> rules) {
+    public Calendar(String name, ArrayList<ShaperRule> rules) {
         this.name = name;
         this.rules = rules;
     }
@@ -37,11 +37,11 @@ public class Calendar {
         this.url = url;
     }
 
-    public ArrayList<CalendarRule> getRules() {
+    public ArrayList<ShaperRule> getRules() {
         return rules;
     }
 
-    public void setRules(ArrayList<CalendarRule> rules) {
+    public void setRules(ArrayList<ShaperRule> rules) {
         this.rules = rules;
     }
 }

@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import fr.bmarsaud.calendarshaper.model.Calendar;
-import fr.bmarsaud.calendarshaper.model.rules.CalendarRule;
+import fr.bmarsaud.calendarshaper.model.rules.ShaperRule;
 
 public class RequestHandler implements HttpHandler {
     private Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -108,7 +108,7 @@ public class RequestHandler implements HttpHandler {
     public byte[] processResponse(byte[] data, Charset charset) {
         String stringData = new String(data, charset);
 
-        for(CalendarRule rule : calendar.getRules()) {
+        for(ShaperRule rule : calendar.getRules()) {
             try {
                 logger.debug("Applying rule " + rule.getClass().getSimpleName());
                 stringData = rule.apply(stringData);

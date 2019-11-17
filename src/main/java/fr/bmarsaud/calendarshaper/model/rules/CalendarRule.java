@@ -1,11 +1,15 @@
 package fr.bmarsaud.calendarshaper.model.rules;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import fr.bmarsaud.calendarshaper.model.transformations.Transformation;
 
+public class CalendarRule extends ShaperRule {
 
-public abstract class CalendarRule {
-    protected transient Logger logger = LoggerFactory.getLogger(CalendarRule.class);
+    @Override
+    public String apply(String data) {
+        for(Transformation transformation : transformations) {
+            data = transformation.transform(data);
+        }
 
-    public abstract String apply(String data);
+        return data;
+    }
 }
