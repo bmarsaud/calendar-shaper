@@ -1,0 +1,54 @@
+[
+  {
+    "name": "ifa",
+    "url": "https://ade.insa-lyon.fr/snipped/url",
+    "rules": [
+      {
+        // Change the SUMMARY by the real name of the course located in the DESCRIPTION
+        "type": "TagRule",
+        "tag": "SUMMARY",
+        "transformations": [
+          {
+            "type": "TagValue", // Select the description
+            "params": {
+              "tag": "DESCRIPTION"
+            }
+          },
+          {
+            "type": "Selection", // Select the course name
+            "params": {
+              "regex": "] ([^\\\\]*)",
+              "groupId": 1
+            }
+          },
+          {
+            "type": "Remove", // Remove empty lines
+            "params": {
+              "regex": "\\R "
+            }
+          }
+        ]
+      },
+      {
+        // Change the DESCRIPTION by the prof name
+        "type": "TagRule",
+        "tag": "DESCRIPTION",
+        "transformations": [
+          {
+            "type": "Selection", // Select the prof name
+            "params": {
+              "regex": "::4IFA\\\\n([^\\\\]*)",
+              "groupId": 1
+            }
+          },
+          {
+            "type": "Remove",
+            "params": {
+              "regex": "\\R " // Remove empty line
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
