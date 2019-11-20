@@ -10,6 +10,3 @@ services:
       - 80
     volumes:
       - calendar-shaper:/opt/calendar-shaper/config
-
-volumes:
-  calendar-shaper:
