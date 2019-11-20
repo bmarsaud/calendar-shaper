@@ -22,8 +22,6 @@ import fr.bmarsaud.calendarshaper.model.Calendar;
 import fr.bmarsaud.calendarshaper.model.Configuration;
 import fr.bmarsaud.calendarshaper.model.rules.ShaperRule;
 import fr.bmarsaud.calendarshaper.model.rules.RuleSerializer;
-import fr.bmarsaud.calendarshaper.model.transformations.Transformation;
-import fr.bmarsaud.calendarshaper.model.transformations.TransformationSerializer;
 
 public class CalendarShaper {
     private Logger logger = LoggerFactory.getLogger(CalendarShaper.class);
@@ -42,6 +40,7 @@ public class CalendarShaper {
     }
 
     public void loadConfiguration() {
+        Configuration.populateDefaultConfiguration();
         File file = new File(Configuration.CONFIG_FILE);
 
         if(file.exists()) {
@@ -71,6 +70,8 @@ public class CalendarShaper {
                 logger.error("Error while loading the calendars");
                 e.printStackTrace();
             }
+        } else {
+            logger.info("Calendars config not found !");
         }
     }
 
