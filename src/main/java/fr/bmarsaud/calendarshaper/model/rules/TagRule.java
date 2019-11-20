@@ -19,7 +19,7 @@ public class TagRule extends ShaperRule {
         String splitData[] = data.split(EventRule.SPLIT_TOKEN);
         String parsedData = splitData[0];
 
-        for(int i = 1; i < splitData.length - 1; i++ ) {
+        for(int i = 1; i < splitData.length; i++ ) {
             String eventData = splitData[i];
 
             Matcher matcher = pattern.matcher(eventData);
@@ -41,7 +41,6 @@ public class TagRule extends ShaperRule {
             parsedData += eventData;
         }
 
-        parsedData += splitData[splitData.length - 1];
         return parsedData;
     }
 }

@@ -10,7 +10,7 @@ public class EventRule extends ShaperRule {
         String splitData[] = data.split(SPLIT_TOKEN);
         String parsedData = splitData[0];
 
-        for(int i = 1; i < splitData.length - 1; i++ ) {
+        for(int i = 1; i < splitData.length; i++ ) {
             String eventData = splitData[i];
 
             for(Transformation transformation : transformations) {
@@ -20,8 +20,6 @@ public class EventRule extends ShaperRule {
             parsedData += SPLIT_TOKEN;
             parsedData += eventData;
         }
-
-        parsedData += splitData[splitData.length - 1];
 
         return parsedData;
     }
