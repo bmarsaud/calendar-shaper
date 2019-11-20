@@ -21,7 +21,6 @@ CONF_TAG_AS_LATEST=true
 echo "=== ENVIRONMENT ==="
 echo "-> Docker"
 echo "IMAGE=$IMAGE"
-echo "IMAGE_TAG=$IMAGE_TAG"
 echo "REGISTRY=$REGISTRY"
 echo "TAG_AS_LATEST=$TAG_AS_LATEST"
 echo "==================="
@@ -56,6 +55,7 @@ $TAG_AS_LATEST && docker tag $IMAGE $REGISTRY/$IMAGE:latest
 docker tag $IMAGE $REGISTRY/$IMAGE:$IMAGE_TAG
 docker tag $IMAGE $IMAGE:$IMAGE_TAG
 docker push $REGISTRY/$IMAGE:$IMAGE_TAG
+$TAG_AS_LATEST && docker push $REGISTRY/$IMAGE:latest
 docker rmi $REGISTRY/$IMAGE:$IMAGE_TAG || true
 docker rmi $IMAGE || true
 echo "Done."
