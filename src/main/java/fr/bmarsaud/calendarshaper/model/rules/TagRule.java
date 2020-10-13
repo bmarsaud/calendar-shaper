@@ -37,7 +37,7 @@ public class TagRule extends ShaperRule {
                 eventData = matcher.replaceFirst(tag + ":" + tagData);
             }
 
-            parsedData += EventRule.SPLIT_TOKEN;
+            parsedData += EventRule.UNITE_TOKEN;
             parsedData += eventData;
         }
 
